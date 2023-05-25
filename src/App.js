@@ -7,7 +7,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { initializeApp } from "firebase/app";
 // import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs } from "firebase/firestore";
 function App() {
 
 
@@ -31,20 +31,27 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-// const analytics = getAnalytics(app);
 const db = getFirestore(app);
+
+/***************Send Data***************/
 const handleSendData = async(values)=>{
   try {
     const docRef = await addDoc(collection(db, "users"), {
-     firstName:values.fname
+      firstName:values.fname
     });
     console.log("Document written with ID: ", docRef.id);
   } catch (e) {
     console.error("Error adding document: ", e);
   }
 }
-
-
+/***************Add Data***************/
+const handleGetData = async()=>{
+  const querySnapshot = await getDocs(collection(db, "users"));
+  querySnapshot.forEach((doc) => {
+    console.log(`${doc.id} => ${JSON.stringify(doc.data())}`);
+  });
+}
+handleGetData();
   //schema for validation
   let userSchema = yup.object({
     fname: yup.string().required('This is Required').max(15,"limit exceed").min(3,"name too small").trim("spaces not allow at begining and and"),
